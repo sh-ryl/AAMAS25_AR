@@ -1,4 +1,3 @@
-import copy
 import math
 import gym
 import numpy as np

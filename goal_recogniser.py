@@ -1,12 +1,8 @@
 import torch
 import torch.nn.functional as F
-import string
 import numpy as np
-import agent
-from cooperative_craft_world import CooperativeCraftWorldState
 from cooperative_craft_world import elo
 from dqn import DQN, DQN_Config
-from dialog import Dialog
 
 import os
 import re
@@ -15,7 +11,6 @@ from copy import deepcopy
 from itertools import chain
 
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 class GoalRecogniser(object):
