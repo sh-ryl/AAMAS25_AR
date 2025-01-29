@@ -1,18 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Dialog class is used to draw plots during training
+
+
 class Dialog(object):
 
     def __init__(self):
         self.reset()
-
 
     def reset(self):
         self.plots = {}
         self.plot_width = 200
         self.first_update = True
         self.num_plots = None
-
 
     def add_data_point(self, plot_name, x_value, y_values, trim_x, show_graphs):
 
@@ -61,9 +62,9 @@ class Dialog(object):
 
             i = 0
             while i < self.num_plots:
-                plot["y" + str(i)] = plot["y" + str(i)][1:(self.plot_width + 1)]
+                plot["y" + str(i)] = plot["y" + str(i)
+                                          ][1:(self.plot_width + 1)]
                 i += 1
-
 
     def update_image(self, debug_txt, labels):
 
@@ -82,13 +83,15 @@ class Dialog(object):
                 plt.xlim(max(0, plot["x"][0]), plot["x"][0] + 0.00001)
                 self.first_update = False
             else:
-                plt.xlim(max(0, plot["x"][0]), max(0.00001, plot["x"][len(plot["x"]) - 1]))
+                plt.xlim(max(0, plot["x"][0]), max(
+                    0.00001, plot["x"][len(plot["x"]) - 1]))
 
             plt.ylim(plot["min_y"], plot["max_y"])
 
             i = 0
             while i < self.num_plots:
-                plt.plot(plot["x"], plot["y" + str(i)], c='C' + str(i), label=labels[i])
+                plt.plot(plot["x"], plot["y" + str(i)],
+                         c='C' + str(i), label=labels[i])
                 i += 1
 
             plt.legend(loc="upper left")
@@ -96,7 +99,6 @@ class Dialog(object):
             plot["fig"].canvas.flush_events()
 
             plt.clf()
-
 
     def save_image(self, log_dir):
 
@@ -124,5 +126,6 @@ class Dialog(object):
 
             plt.draw()
             plot["fig"].canvas.flush_events()
-            plot["fig"].savefig(log_dir + 'plot_' + str(key) + '.png', format='png')
+            plot["fig"].savefig(log_dir + 'plot_' +
+                                str(key) + '.png', format='png')
             plt.clf()
