@@ -87,7 +87,6 @@ class NeuralQLearner(agent.Agent):
 
         self.q_values_plot = Dialog()
         self.score_plot = Dialog()
-        self.clipped_score_plot = Dialog()
 
         super().__init__(name)
 
@@ -153,8 +152,6 @@ class NeuralQLearner(agent.Agent):
 
         self.score_plot.add_data_point("movingAverageScore", self.numSteps, [
                                        zero_debiased_score], False, self.show_graphs)
-        self.clipped_score_plot.add_data_point("movingAverageClippedScore", self.numSteps, [
-                                               zero_debiased_score_clipped], False, self.show_graphs)
 
         self.episode_score = 0
         self.episode_score_clipped = 0
@@ -211,7 +208,6 @@ class NeuralQLearner(agent.Agent):
             if self.numSteps % self.graph_save_freq == 0:
                 self.q_values_plot.save_image(self.log_dir)
                 self.score_plot.save_image(self.log_dir)
-                self.clipped_score_plot.save_image(self.log_dir)
 
             self.numSteps += 1
 
