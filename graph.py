@@ -2,6 +2,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# TODO create a function for this instead!
+
 # File paths of CSVs
 # cloth_stick
 # root = "mod/gr_log/cloth_stick"

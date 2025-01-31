@@ -12,6 +12,7 @@ from itertools import chain
 
 import pandas as pd
 
+# TODO change filename to reflect work -- not only dealing with goal!
 
 class GoalRecogniser(object):
 
@@ -142,6 +143,7 @@ class GoalRecogniser(object):
 
             # bayes prob
             if action == 5 and len(state.ab_rating) > 0:
+                # TODO - update later: modified transition function for ability level
                 act_probs[action] = act_probs[action] * \
                     elo(state.ab_rating['player'],
                         state.ab_rating['craft']) * 1

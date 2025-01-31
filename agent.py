@@ -2,6 +2,8 @@ from abc import abstractmethod
 from cooperative_craft_world import CooperativeCraftWorldState
 
 
+# Abstract class to allow different types of Agent object
+# Currently there's only one type of Agent: neural_q_learner.py
 class Agent(object):
 
     def __init__(self, name):

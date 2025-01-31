@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from cooperative_craft_world import _rewardable_items
 
+# TODO create a function for this instead!
+
 # mod = "iron_wood_grass"
 # wc = [(1, -1, ""), (-1, 1, ""), (1, -1, "_belief"), (-1, 1, "_belief")]
 # weight_combo = [f'/iron_0.7_wood_{w[0]}_grass_{w[1]}{w[2]}' for w in wc]
