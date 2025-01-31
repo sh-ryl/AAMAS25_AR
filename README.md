@@ -9,7 +9,7 @@ Code is adapted from *Multi-Agent Intention Recognition and Progression*, by Mic
 
 ....
 
-Feel free to email Michael at michael.dann@rmit.edu.au if you have any issues getting the code to run.
+Feel free to email Michael at sheryl.mantik@student.rmit.edu.au if you have any issues getting the code to run.
 
 ## Running
 
