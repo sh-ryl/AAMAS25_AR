@@ -6,7 +6,7 @@ import numpy as np
 import agent
 from torch.distributions import Categorical
 from random import randrange
-from cooperative_craft_world import CooperativeCraftWorldState
+from environment import CraftWorldState
 from dqn import DQN
 from transition_table import TransitionTable
 from dialog import Dialog
@@ -156,7 +156,7 @@ class NeuralQLearner(agent.Agent):
         self.episode_score = 0
         self.episode_score_clipped = 0
 
-    def perceive(self, reward: float, state: CooperativeCraftWorldState, terminal: bool, is_eval: bool):
+    def perceive(self, reward: float, state: CraftWorldState, terminal: bool, is_eval: bool):
 
         state = torch.from_numpy(state.getRepresentation()).float()
 

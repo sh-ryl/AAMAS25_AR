@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from cooperative_craft_world import CooperativeCraftWorldState
+from environment import CraftWorldState
 
 # Abstract class to allow different types of Agent object
 # Currently there's only one type of Agent: neural_q_learner.py
@@ -11,7 +11,7 @@ class Agent(object):
         self.name = name
 
     @abstractmethod
-    def perceive(self, reward: float, state: CooperativeCraftWorldState, terminal: bool, is_eval: bool, model_file: str):
+    def perceive(self, reward: float, state: CraftWorldState, terminal: bool, is_eval: bool, model_file: str):
         pass
 
     def reset(self, attr_set, externally_visible_attr_sets):

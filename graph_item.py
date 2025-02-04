@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from cooperative_craft_world import _rewardable_items
+from config import REWARDABLE_ITEMS
 
 # TODO create a function for this instead!
 
@@ -33,10 +33,10 @@ item_df = [pd.read_csv(f"mod/ar_log/{mod}/{combo}_avg_item_count.csv", header=No
            for combo in weight_combo]
 
 for idf in range(len(wc)):
-    for i in range(len(_rewardable_items)):
+    for i in range(len(REWARDABLE_ITEMS)):
         y = item_df[idf].iloc[:, i].values
         x = range(len(y))
-        axs[idf].plot(x, y, label=_rewardable_items[i], color=colors[i])
+        axs[idf].plot(x, y, label=REWARDABLE_ITEMS[i], color=colors[i])
 
 # Clear the last subplot
 axs[idf+1].axis("off")

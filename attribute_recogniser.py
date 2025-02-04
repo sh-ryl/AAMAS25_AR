@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 import numpy as np
-from cooperative_craft_world import elo
+from utils import elo
 from dqn import DQN, DQN_Config
 
 import os
@@ -11,8 +11,6 @@ from copy import deepcopy
 from itertools import chain
 
 import pandas as pd
-
-# TODO change filename to reflect work -- not only dealing with attribute!
 
 
 class AttributeRecogniser(object):

@@ -8,8 +8,9 @@ import decimal
 import scenario
 from random import randrange
 
-from cooperative_craft_world import CooperativeCraftWorld
-from cooperative_craft_world import _rewardable_items
+from environment import CraftWorld
+from utils import REWARDABLE_ITEMS
+from config import Action
 
 from neural_q_learner import NeuralQLearner
 from dqn import DQN_Config
@@ -233,8 +234,8 @@ if custom_param != "":
 # endregion
 
 # region ENV INIT
-env = CooperativeCraftWorld(current_scenario, size=size, n_agents=n_agents, allow_no_op=False, render=env_render,
-                            ingredient_regen=current_scenario["regeneration"], max_steps=max_steps, exp_param=exp_param, ab_rating=ab_rating, test_mode=agent_params["test_mode"])
+env = CraftWorld(current_scenario, size=size, n_agents=n_agents, allow_no_op=False, render=env_render,
+                 ingredient_regen=current_scenario["regeneration"], max_steps=max_steps, exp_param=exp_param, ab_rating=ab_rating, test_mode=agent_params["test_mode"])
 # endregion
 
 agent_params["agent_type"] = "dqn"
@@ -402,7 +403,7 @@ reset_all()
 # input("Start?")
 # print("---------------------------------------------")
 
-item_count_eptotal = {k: [0] * max_steps for k in _rewardable_items}
+item_count_eptotal = {k: [0] * max_steps for k in REWARDABLE_ITEMS}
 
 while frame_num < max_training_frames:
     for item in item_count_eptotal.keys():
@@ -412,22 +413,22 @@ while frame_num < max_training_frames:
 
     # print action chosen by agent
     if env_render:
-        a_str = ''
-        if a == 0:
-            a_str = "UP"
-        elif a == 1:
-            a_str = "DOWN"
-        elif a == 2:
-            a_str = "LEFT"
-        elif a == 3:
-            a_str = "RIGHT"
-        elif a == 4:
-            a_str = "COLLECT"
-        elif a == 5:
-            a_str = "CRAFT"
-        elif a == 6:
-            a_str = "NO_OP"
-        print(f"Action taken: {a} {a_str}")
+        # a_str = ''
+        # if a == 0:
+        #     a_str = "UP"
+        # elif a == 1:
+        #     a_str = "DOWN"
+        # elif a == 2:
+        #     a_str = "LEFT"
+        # elif a == 3:
+        #     a_str = "RIGHT"
+        # elif a == 4:
+        #     a_str = "COLLECT"
+        # elif a == 5:
+        #     a_str = "CRAFT"
+        # elif a == 6:
+        #     a_str = "NO_OP"
+        print(f"Action taken: {a} {Action(a)}")
 
     if ar_obs:
         AR.perceive(state, a, frame_num, print_result=print_result)

@@ -5,99 +5,15 @@ import random
 from time import sleep
 from vector_2d import Vector2D
 
+from config import Action, RECIPES, RAW_RECIPES, REWARDABLE_ITEMS, SPRITES
 
-_sprites = {
-    "wood": '|',
-    "iron": '=',
-    "grass": '#',
-    "gem": '@',
-    "gold": '*',
-    "workbench": 'W',
-    "toolshed": 'T',
-    "factory": 'F'
-}
+from utils import Screen, print_or_log, elo
 
 _num_spawned = None
 _reward = []
 
-_rewardable_items = [
-    "axe",
-    "bed",
-    "bridge",
-    "cloth",
-    "gem",
-    "gold",
-    "grass",
-    "iron",
-    "plank",
-    "rope",
-    "stick",
-    "wood"
-]
 
-_recipes = {
-    "axe": ("toolshed", {"iron": 1, "stick": 1}),
-    "bed": ("workbench", {"grass": 1, "plank": 1}),
-    "bridge": ("factory", {"iron": 1, "wood": 1}),
-    "cloth": ("factory", {"grass": 1}),
-    "plank": ("toolshed", {"wood": 1}),
-    "rope": ("toolshed", {"grass": 1}),
-    "stick": ("workbench", {"wood": 1})
-}
-
-_raw_recipes = {
-    "axe": {"iron": 1, "wood": 1},
-    "bed": {"grass": 1, "wood": 1},
-    "bridge": {"iron": 1, "wood": 1},
-    "cloth": {"grass": 1},
-    "plank": {"wood": 1},
-    "rope": {"grass": 1},
-    "stick": {"wood": 1}
-}
-
-UP = 0
-DOWN = 1
-LEFT = 2
-RIGHT = 3
-COLLECT = 4
-CRAFT = 5
-NO_OP = 6
-
-
-def print_or_log(str, filename):
-
-    if filename is not None:
-        with open(filename, 'a') as fd:
-            fd.write(str + "\n")
-    else:
-        print(str)
-
-
-def elo(ra, rb):
-    # the probability of a winning over b
-    # following elo rating formula
-    return 1/(1 + 10 ** ((rb - ra)/400))
-
-
-class Screen():
-
-    def __init__(self, size):
-        self.size = size
-        self.rows = []
-        for y in range(0, self.size[1]):
-            self.rows.append('.' * self.size[0])
-
-    def add_sprite(self, sprite_pos, sprite):
-        row = len(self.rows) - sprite_pos.y - 1
-        self.rows[row] = self.rows[row][:sprite_pos.x] + \
-            sprite + self.rows[row][sprite_pos.x + 1:]
-
-    def render(self, filename=None):
-        for y in range(0, self.size[1]):
-            print_or_log(self.rows[y], filename)
-
-
-class CooperativeCraftWorldState():
+class CraftWorldState():
 
     def __init__(self, size, action_space, n_agents=1, ingredient_regen=True, max_steps=300, hidden_items=[], exp_param=[], ab_rating=[], test_mode=False):
         self.player_turn = 0
@@ -147,21 +63,21 @@ class CooperativeCraftWorldState():
         if self.terminal:
             return reward
 
-        if action == UP:
+        if action == Action.UP:
             if (self.objects["player"][self.player_turn].y + 1) < self.size[1]:
                 self.objects["player"][self.player_turn].y += 1
-        elif action == DOWN:
+        elif action == Action.DOWN:
             if (self.objects["player"][self.player_turn].y - 1) >= 0:
                 self.objects["player"][self.player_turn].y -= 1
-        elif action == LEFT:
+        elif action == Action.LEFT:
             if (self.objects["player"][self.player_turn].x - 1) >= 0:
                 self.objects["player"][self.player_turn].x -= 1
-        elif action == RIGHT:
+        elif action == Action.RIGHT:
             if (self.objects["player"][self.player_turn].x + 1) < self.size[0]:
                 self.objects["player"][self.player_turn].x += 1
 
         # Check if we can pick up an item
-        if action == COLLECT:
+        if action == Action.COLLECT:
             for k in self._max_inventory.keys():
 
                 can_pick_up = True
@@ -186,8 +102,8 @@ class CooperativeCraftWorldState():
                             break
 
         # Check if we can craft
-        if action == CRAFT:
-            for k, v in _recipes.items():
+        if action == Action.CRAFT:
+            for k, v in RECIPES.items():
                 # if player location is at a crafting location
                 if self.objects["player"][self.player_turn] in self.objects[v[0]]:
                     recipe_met = True
@@ -219,9 +135,9 @@ class CooperativeCraftWorldState():
                                     for x in range(required_count):
                                         self.objects[ingredient].append(
                                             self.get_free_square())
-                                elif ingredient in _raw_recipes:  # non raw items
+                                elif ingredient in RAW_RECIPES:  # non raw items
                                     # hard coded raw recipes to convert ingreds back to raw
-                                    ingred_recipe = _raw_recipes[ingredient]
+                                    ingred_recipe = RAW_RECIPES[ingredient]
                                     for raw_item in ingred_recipe:
                                         required_count = ingred_recipe[raw_item]
                                         for x in range(required_count):
@@ -289,7 +205,7 @@ class CooperativeCraftWorldState():
         self.inventory = []
         for _ in range(0, self.n_agents):
             agent_inv = {}
-            for item in _rewardable_items:
+            for item in REWARDABLE_ITEMS:
                 agent_inv[item] = 0
 
             self.inventory.append(agent_inv)
@@ -399,7 +315,7 @@ class CooperativeCraftWorldState():
                     screen.add_sprite(v[agent_num], str(agent_num))
             else:
                 for pos in v:
-                    screen.add_sprite(pos, _sprites[k])
+                    screen.add_sprite(pos, SPRITES[k])
 
         screen.render(filename)
 
@@ -409,7 +325,7 @@ class CooperativeCraftWorldState():
             sleep(0.1)
 
 
-class CooperativeCraftWorld(gym.Env):
+class CraftWorld(gym.Env):
 
     def __init__(self, scenario, size=(10, 10), n_agents=1, allow_no_op=False, render=False, ingredient_regen=True, max_steps=300, exp_param=[], ab_rating=[], test_mode=False):
 
@@ -487,7 +403,7 @@ class CooperativeCraftWorld(gym.Env):
                     reward_list = agent.attr_set
                 reward_dic["uvfa"] = 0
 
-            for item in _rewardable_items:
+            for item in REWARDABLE_ITEMS:
                 if item in agent.attr_set.keys():
                     if "uvfa" in self.exp_param and not self.test_mode:
                         item_id = list(agent.attr_set.keys()).index(item)
@@ -498,7 +414,7 @@ class CooperativeCraftWorld(gym.Env):
                     reward_dic[item] = 0
                     if "incentive" in self.exp_param:
                         # Incentivize collecting req items to craft attribute set
-                        for k, v in _recipes.items():
+                        for k, v in RECIPES.items():
                             if item in v[1] and k in agent.attr_set:
                                 reward_dic[item] = 0.2
                                 break
