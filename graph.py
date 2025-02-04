@@ -78,11 +78,11 @@ for row in range(2):
     if row == 1:
         data = ag_df_2
     for ag in range(len(ag_wc)):
-        for gr in range(len(gr_weight_combo)):
-            y = data[ag].iloc[:, gr].values
+        for ar in range(len(gr_weight_combo)):
+            y = data[ag].iloc[:, ar].values
             x = range(len(y))
             axs[row, ag].plot(
-                x, y, label=gr_weight_combo[gr])
+                x, y, label=gr_weight_combo[ar])
 
             if row == 0:
                 axs[row, ag].set_title(ag_titles[ag], fontsize=12)
@@ -103,7 +103,7 @@ for x in range(total_plot-len(ag_wc)):
 
 # Add a common legend outside all subplots
 handles, labels = axs[1, ag].get_legend_handles_labels()
-fig.legend(handles, labels, loc=legend_loc, title="GR Observer")
+fig.legend(handles, labels, loc=legend_loc, title="AR Observer")
 
 # Adjust layout
 plt.tight_layout()

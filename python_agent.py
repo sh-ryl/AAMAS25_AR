@@ -53,7 +53,7 @@ def attr_dic_to_str(attr_dic, inc_weight):
 
 def reset_all():
 
-    global agent, total_reward, num_trials, seed, state, gr_obs, GR
+    global agent, total_reward, num_trials, seed, state, gr_obs, AR
 
     num_trials += 1
 
@@ -75,7 +75,7 @@ def reset_all():
     state = env.reset([agent], seed)
 
     if gr_obs:
-        GR.reset()
+        AR.reset()
 
     # Give starting items (if applicable).
     for i in range(len([agent])):
@@ -150,7 +150,7 @@ if sys.argv[1] == "train":
 else:
     check_out.write("Testing with CPU\n")
     agent_params["test_mode"] = True
-    n_agents = 1  # 2 # Change for this code since we are only doing single agent GR
+    n_agents = 1  # 2 # Change for this code since we are only doing single agent AR
     gpu = -1  # Use CPU when not training
 
 exp_param = sys.argv[2::]
@@ -173,19 +173,19 @@ if "render" in exp_param:
 else:
     check_out.write("Rendering environment OFF\n")
 
-if "GR" in exp_param:
+if "AR" in exp_param:
     gr_obs = True
     gr_out_param = {}
-    exp_param.remove('GR')
-    check_out.write("GR Observer is ON\n")
+    exp_param.remove('AR')
+    check_out.write("AR Observer is ON\n")
 else:
-    check_out.write("GR Observer is OFF\n")
+    check_out.write("AR Observer is OFF\n")
 
 if "result" in exp_param:
     exp_param.remove('result')
     if gr_obs:
         print_result = True
-        check_out.write("Printing result from GR\n")
+        check_out.write("Printing result from AR\n")
 
 if "limit" in exp_param:
     limit = True
@@ -289,12 +289,12 @@ if agent_params["test_mode"]:
 agent_params["saved_model_dir"] = os.path.dirname(
     os.path.realpath(__file__)) + '/saved_models/'
 
-# Observer (GR) I/O Settings
+# Observer (AR) I/O Settings
 if gr_obs:
-    gr_models_root = '/mod/gr/'
+    gr_models_root = '/mod/ar/'
     gr_models_folder = gr_models_root
     model_dir = real_path + gr_models_folder
-    print(f"GR model folder: {gr_models_folder}")
+    print(f"AR model folder: {gr_models_folder}")
 
     attr_log_path = real_path + '/mod/gr_log/' + \
         attr_dic_to_str(attr_dic, inc_weight=False)  # doesn't include weight
@@ -387,12 +387,12 @@ seed = -1
 state = None
 # endregion
 
-# region GR INIT
+# region AR INIT
 
 if gr_obs:
-    # creates a separate config for gr and agent
+    # creates a separate config for ar and agent
     gr_dqn_config = deepcopy(agent_params["dqn_config"])
-    GR = AttributeRecogniser(attr_list=list(attr_dic.keys()), saved_model_dir=model_dir,
+    AR = AttributeRecogniser(attr_list=list(attr_dic.keys()), saved_model_dir=model_dir,
                              dqn_config=gr_dqn_config, log_dir=attr_log_path, exp_param=exp_param, max_steps=max_steps)
 # endregion
 
@@ -430,7 +430,7 @@ while frame_num < max_training_frames:
         print(f"Action taken: {a} {a_str}")
 
     if gr_obs:
-        GR.perceive(state, a, frame_num, print_result=print_result)
+        AR.perceive(state, a, frame_num, print_result=print_result)
 
     state, reward_list, episode_done, info = env.step_full_state(a)
 
@@ -481,7 +481,7 @@ while frame_num < max_training_frames:
                 score_str = score_str + ', ' + \
                     agent.name + ": " + str(total_reward)
 
-            if not env_render:  # not gr_obs # if gr is off then print as normal
+            if not env_render:  # not gr_obs # if ar is off then print as normal
                 1  # print('Time step: ' + str(frame_num) +
                 #       ', ep scores:' + score_str[1:])
 
@@ -526,7 +526,7 @@ while frame_num < max_training_frames:
                 steps_since_eval_began = 0
 
 if gr_obs:
-    GR.get_result(max_training_frames, attr_dic_to_str(
+    AR.get_result(max_training_frames, attr_dic_to_str(
         attr_dic, inc_weight=True), gr_out_param, item_count_eptotal)
 
 # endregion

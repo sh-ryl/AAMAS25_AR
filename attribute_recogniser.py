@@ -25,7 +25,7 @@ class AttributeRecogniser(object):
         self.first_log_write = True
         self.log_dir = log_dir
 
-        # GR Model Settings
+        # AR Model Settings
         self.model_temperature = model_temperature
         self.hypothesis_momentum = hypothesis_momentum
         self.kl_tolerance = kl_tolerance
@@ -34,7 +34,7 @@ class AttributeRecogniser(object):
         self.step_number = 0
         self.max_steps = max_steps
 
-        # Load GR observer models
+        # Load AR observer models
         self.trained_models = []
         self.tm_paths, self.tm_param = self.find_folders(
             self.saved_model_dir, attr_list, exp_param)
@@ -55,7 +55,7 @@ class AttributeRecogniser(object):
                 self.saved_model_dir)
 
             print(
-                f"GR model {i}: {self.tm_paths[i]}, Param: {self.tm_param[i]}")
+                f"AR model {i}: {self.tm_paths[i]}, Param: {self.tm_param[i]}")
 
         if "uvfa" in exp_param:
             # currently only applied for attribute preferences and for 2 weights
@@ -75,7 +75,7 @@ class AttributeRecogniser(object):
                 remove_count = 0
                 for i in choice:
                     print(
-                        f"REMOVING GR model: {self.tm_paths[i-remove_count]}")
+                        f"REMOVING AR model: {self.tm_paths[i-remove_count]}")
                     self.tm_paths.pop(i-remove_count)
                     self.tm_param.pop(i-remove_count)
                     self.trained_models.pop(i-remove_count)
@@ -85,7 +85,7 @@ class AttributeRecogniser(object):
                 print("Updated Model List")
                 for i in range(len(self.tm_paths)):
                     print(
-                        f"GR model {i}: {self.tm_paths[i]}, Param: {self.tm_param[i]}")
+                        f"AR model {i}: {self.tm_paths[i]}, Param: {self.tm_param[i]}")
 
         if "uvfa" in exp_param:
             self.gr_num = len(self.uvfa_weight)
@@ -154,7 +154,7 @@ class AttributeRecogniser(object):
         eps = 1e-20
         if print_result:
             print()
-            print("---------------- GR Inference ---------------")
+            print("---------------- AR Inference ---------------")
             col = ['No.',
                    'trained model paths',
                    'DKL sum',
