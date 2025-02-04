@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from config import REWARDABLE_ITEMS
+from constants import REWARDABLE_ITEMS
 
 # TODO create a function for this instead!
 

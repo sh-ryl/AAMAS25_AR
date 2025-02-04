@@ -15,13 +15,11 @@ class Agent(object):
         pass
 
     def reset(self, attr_set, externally_visible_attr_sets):
-        # this function is used in attribute_recogniser.py!
-        # to be investigated: but also why is this here?
         # this current setup assumes that attr is agent specific
         self.attr_set = attr_set
         self.externally_visible_attr_sets = externally_visible_attr_sets
 
         self.attribute = list(self.attr_set.keys())[0]
         for i in range(1, len(list(self.attr_set.keys()))):
-            self.attribute = self.attr + "_and_" + \
+            self.attribute = self.attribute + "_and_" + \
                 list(self.attr_set.keys())[i]

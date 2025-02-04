@@ -5,7 +5,7 @@ import random
 from time import sleep
 from vector_2d import Vector2D
 
-from config import Action, RECIPES, RAW_RECIPES, REWARDABLE_ITEMS, SPRITES
+from constants import Action, RECIPES, RAW_RECIPES, REWARDABLE_ITEMS, SPRITES, UNLIMITED_INV, LIMITED_INV
 
 from utils import Screen, print_or_log, elo
 
@@ -34,22 +34,10 @@ class CraftWorldState():
         if "uvfa" in exp_param:
             self.uvfa = True
 
-        self._max_inventory = {
-            "wood": 999,
-            "iron": 999,
-            "grass": 999,
-            "gem": 999,
-            "gold": 999
-        }
+        self._max_inventory = UNLIMITED_INV
 
         if "limit" in exp_param:
-            self._max_inventory = {
-                "wood": 1,
-                "iron": 1,
-                "grass": 1,
-                "gem": 999,
-                "gold": 999
-            }
+            self._max_inventory = LIMITED_INV
 
         self.ab_rating = ab_rating
 
@@ -315,6 +303,7 @@ class CraftWorldState():
                     screen.add_sprite(v[agent_num], str(agent_num))
             else:
                 for pos in v:
+                    # get the key values
                     screen.add_sprite(pos, SPRITES[k])
 
         screen.render(filename)
@@ -346,7 +335,7 @@ class CraftWorld(gym.Env):
         if "belief" in exp_param:
             hidden_items = scenario["hidden_items"][0]
 
-        self.state = CooperativeCraftWorldState(
+        self.state = CraftWorldState(
             size, self.action_space, n_agents=n_agents, ingredient_regen=ingredient_regen, max_steps=max_steps, hidden_items=hidden_items, exp_param=exp_param, ab_rating=ab_rating, test_mode=test_mode)
 
         self.observation_space = gym.spaces.Box(
@@ -360,22 +349,7 @@ class CraftWorld(gym.Env):
 
     # This 'step' is defined just to meet the requirements of gym.Env.
     # It returns a numpy array representation of the state based on an 'eye' encoding.
-
     def step(self, action):
-        player_turn = self.state.player_turn
-        reward = self.state.step(action)[player_turn]
-        info = {}
-
-        if self.render:
-            self.state.render(True)
-
-        ag_state = self.state.getRepresentation()
-
-        return ag_state, reward, self.state.terminal, info
-
-    # This 'step' is used by scheduler_agent
-
-    def step_full_state(self, action):
         reward = self.state.step(action)
         info = {}
 

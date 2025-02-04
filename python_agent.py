@@ -6,11 +6,9 @@ import datetime
 import numpy as np
 import decimal
 import scenario
-from random import randrange
 
 from environment import CraftWorld
-from utils import REWARDABLE_ITEMS
-from config import Action
+from constants import Action, REWARDABLE_ITEMS
 
 from neural_q_learner import NeuralQLearner
 from dqn import DQN_Config
@@ -167,13 +165,6 @@ limit = False
 ability = False
 uvfa = False
 
-if "render" in exp_param:
-    env_render = True
-    exp_param.remove('render')
-    check_out.write("Rendering environment ON\n")
-else:
-    check_out.write("Rendering environment OFF\n")
-
 if "AR" in exp_param:
     ar_obs = True
     ar_out_param = {}
@@ -182,11 +173,21 @@ if "AR" in exp_param:
 else:
     check_out.write("AR Observer is OFF\n")
 
-if "result" in exp_param:
-    exp_param.remove('result')
+if "render" in exp_param:
+    env_render = True
+    exp_param.remove('render')
+    check_out.write("Rendering environment ON\n")
     if ar_obs:
         print_result = True
         check_out.write("Printing result from AR\n")
+else:
+    check_out.write("Rendering environment OFF\n")
+
+# if "result" in exp_param:
+#     exp_param.remove('result')
+#     if ar_obs:
+#         print_result = True
+#         check_out.write("Printing result from AR\n")
 
 if "limit" in exp_param:
     limit = True
@@ -413,27 +414,12 @@ while frame_num < max_training_frames:
 
     # print action chosen by agent
     if env_render:
-        # a_str = ''
-        # if a == 0:
-        #     a_str = "UP"
-        # elif a == 1:
-        #     a_str = "DOWN"
-        # elif a == 2:
-        #     a_str = "LEFT"
-        # elif a == 3:
-        #     a_str = "RIGHT"
-        # elif a == 4:
-        #     a_str = "COLLECT"
-        # elif a == 5:
-        #     a_str = "CRAFT"
-        # elif a == 6:
-        #     a_str = "NO_OP"
         print(f"Action taken: {a} {Action(a)}")
 
     if ar_obs:
         AR.perceive(state, a, frame_num, print_result=print_result)
 
-    state, reward_list, episode_done, info = env.step_full_state(a)
+    state, reward_list, episode_done, info = env.step(Action(a))
 
     reward = reward_list[0]  # reward is list with length based on num_agents
 
