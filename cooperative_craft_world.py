@@ -297,7 +297,7 @@ class CooperativeCraftWorldState():
         self.terminal = False
         self.steps = 0
 
-    def getRepresentation(self, gr_obs=False, gr_param=[]):
+    def getRepresentation(self, ar_obs=False, ar_param=[]):
         # ADD objects on the environment
         rep = []
         max_dist = np.sqrt(
@@ -306,13 +306,13 @@ class CooperativeCraftWorldState():
         angle_increment = 45  # Note: Should divide perfectly into 360
 
         sorted_keys = sorted(self.objects.keys())
-        if (self.belief and not gr_obs):
+        if (self.belief and not ar_obs):
             sorted_keys = [
                 x for x in sorted_keys if x not in self.hidden_items]
             sorted_keys.append("hidden")
-        if "belief" in gr_param:
+        if "belief" in ar_param:
             sorted_keys = [
-                x for x in sorted_keys if x not in gr_param['belief']]
+                x for x in sorted_keys if x not in ar_param['belief']]
             sorted_keys.append("hidden")
 
         for k in sorted_keys:
@@ -358,16 +358,16 @@ class CooperativeCraftWorldState():
 
         # ADD reward
         # COMMENT OUT "and not self.test_mode" TO USE UVFA MODEL FOR AGENT
-        if self.uvfa and not gr_obs and not self.test_mode:
+        if self.uvfa and not ar_obs and not self.test_mode:
             for item in sorted_keys:
                 if _reward != []:
                     rep.append(_reward[self.player_turn][item])
                 else:
                     rep.append(0)
-        if "uvfa" in gr_param:
+        if "uvfa" in ar_param:
             for item in sorted_keys:
-                if item in gr_param["uvfa"]:
-                    rep.append(gr_param["uvfa"][item])
+                if item in ar_param["uvfa"]:
+                    rep.append(ar_param["uvfa"][item])
                 else:
                     rep.append(0)
         return np.array(rep, dtype=np.float32)

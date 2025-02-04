@@ -53,7 +53,7 @@ def attr_dic_to_str(attr_dic, inc_weight):
 
 def reset_all():
 
-    global agent, total_reward, num_trials, seed, state, gr_obs, AR
+    global agent, total_reward, num_trials, seed, state, ar_obs, AR
 
     num_trials += 1
 
@@ -74,7 +74,7 @@ def reset_all():
 
     state = env.reset([agent], seed)
 
-    if gr_obs:
+    if ar_obs:
         AR.reset()
 
     # Give starting items (if applicable).
@@ -159,7 +159,7 @@ ab_rating = {}
 
 # exp_param flags
 env_render = False
-gr_obs = False
+ar_obs = False
 print_result = False
 belief = False
 limit = False
@@ -174,8 +174,8 @@ else:
     check_out.write("Rendering environment OFF\n")
 
 if "AR" in exp_param:
-    gr_obs = True
-    gr_out_param = {}
+    ar_obs = True
+    ar_out_param = {}
     exp_param.remove('AR')
     check_out.write("AR Observer is ON\n")
 else:
@@ -183,7 +183,7 @@ else:
 
 if "result" in exp_param:
     exp_param.remove('result')
-    if gr_obs:
+    if ar_obs:
         print_result = True
         check_out.write("Printing result from AR\n")
 
@@ -192,16 +192,16 @@ if "limit" in exp_param:
     check_out.write(
         "Max inventory for collectible items (grass, iron, and wood) is LIMITED to 1\n")
     exp_param_path += 'limit/'
-    if gr_obs:
-        gr_out_param['limit'] = ''
+    if ar_obs:
+        ar_out_param['limit'] = ''
 else:
     check_out.write("Max inventory is 999 for all ingredients\n")
 
 if "uvfa" in exp_param:
     uvfa = True
     check_out.write("UVFA is ON\n")
-    if gr_obs:
-        gr_out_param['uvfa'] = ''
+    if ar_obs:
+        ar_out_param['uvfa'] = ''
 else:
     check_out.write("UVFA is OFF\n")
 
@@ -209,8 +209,8 @@ if "belief" in exp_param:
     belief = True
     check_out.write("Using hidden items\n")
     exp_param_path += 'belief/'
-    if gr_obs:
-        gr_out_param['belief'] = ''
+    if ar_obs:
+        ar_out_param['belief'] = ''
 
 if "ability" in exp_param:
     ability = True
@@ -219,8 +219,8 @@ if "ability" in exp_param:
     ab_rating['player'] = int(input("Enter ability rating for player: "))
     ab_rating['craft'] = 100
     check_out.write("Ability rating for craft action is set to 100\n")
-    if gr_obs:
-        gr_out_param['ability'] = ab_rating['player']
+    if ar_obs:
+        ar_out_param['ability'] = ab_rating['player']
 
 
 # just to label a certain training model
@@ -228,8 +228,8 @@ custom_param = input(
     "Enter any custom param for agent model (leave empty when not used): ")
 if custom_param != "":
     exp_param.append(custom_param)
-    if gr_obs:
-        gr_out_param[custom_param] = ''
+    if ar_obs:
+        ar_out_param[custom_param] = ''
 # endregion
 
 # region ENV INIT
@@ -254,7 +254,7 @@ ag_models_folder = ag_models_root + exp_param_path
 
 # saving/loading agent model for specific reward weightings
 result_folder = ag_models_folder + attr_dic_to_str(attr_dic, inc_weight=True)
-if uvfa and not gr_obs:  # COMMENT OUT "and not gr_obs" TO USE UVFA MODEL FOR AGENT
+if uvfa and not ar_obs:  # COMMENT OUT "and not ar_obs" TO USE UVFA MODEL FOR AGENT
     result_folder = ag_models_folder + \
         attr_dic_to_str(attr_dic, inc_weight=False)
 if belief:
@@ -269,7 +269,7 @@ if custom_param != '':
     result_folder += "_" + custom_param
 agent_params["log_dir"] = real_path + f'{result_folder}/'
 
-if not os.path.exists(agent_params["log_dir"]) and not gr_obs:
+if not os.path.exists(agent_params["log_dir"]) and not ar_obs:
     os.makedirs(agent_params["log_dir"])
     check_out.write(f"Created new folder: {agent_params['log_dir']}\n")
 check_out.write(f"Agent model loaded: {result_folder}\n")
@@ -290,13 +290,13 @@ agent_params["saved_model_dir"] = os.path.dirname(
     os.path.realpath(__file__)) + '/saved_models/'
 
 # Observer (AR) I/O Settings
-if gr_obs:
-    gr_models_root = '/mod/ar/'
-    gr_models_folder = gr_models_root
-    model_dir = real_path + gr_models_folder
-    print(f"AR model folder: {gr_models_folder}")
+if ar_obs:
+    ar_models_root = '/mod/ar/'
+    ar_models_folder = ar_models_root
+    model_dir = real_path + ar_models_folder
+    print(f"AR model folder: {ar_models_folder}")
 
-    attr_log_path = real_path + '/mod/gr_log/' + \
+    attr_log_path = real_path + '/mod/ar_log/' + \
         attr_dic_to_str(attr_dic, inc_weight=False)  # doesn't include weight
     if not os.path.exists(attr_log_path):
         os.makedirs(attr_log_path)
@@ -357,7 +357,7 @@ frame_num = 0
 max_training_frames = 10000000  # 999999999
 if uvfa:
     max_training_frames = 999999999
-if gr_obs:
+if ar_obs:
     max_training_frames = 10000
 steps_since_eval_ran = 0
 steps_since_eval_began = 0
@@ -389,11 +389,11 @@ state = None
 
 # region AR INIT
 
-if gr_obs:
+if ar_obs:
     # creates a separate config for ar and agent
-    gr_dqn_config = deepcopy(agent_params["dqn_config"])
+    ar_dqn_config = deepcopy(agent_params["dqn_config"])
     AR = AttributeRecogniser(attr_list=list(attr_dic.keys()), saved_model_dir=model_dir,
-                             dqn_config=gr_dqn_config, log_dir=attr_log_path, exp_param=exp_param, max_steps=max_steps)
+                             dqn_config=ar_dqn_config, log_dir=attr_log_path, exp_param=exp_param, max_steps=max_steps)
 # endregion
 
 reset_all()
@@ -429,7 +429,7 @@ while frame_num < max_training_frames:
             a_str = "NO_OP"
         print(f"Action taken: {a} {a_str}")
 
-    if gr_obs:
+    if ar_obs:
         AR.perceive(state, a, frame_num, print_result=print_result)
 
     state, reward_list, episode_done, info = env.step_full_state(a)
@@ -481,7 +481,7 @@ while frame_num < max_training_frames:
                 score_str = score_str + ', ' + \
                     agent.name + ": " + str(total_reward)
 
-            if not env_render:  # not gr_obs # if ar is off then print as normal
+            if not env_render:  # not ar_obs # if ar is off then print as normal
                 1  # print('Time step: ' + str(frame_num) +
                 #       ', ep scores:' + score_str[1:])
 
@@ -525,8 +525,8 @@ while frame_num < max_training_frames:
                 eval_running = False
                 steps_since_eval_began = 0
 
-if gr_obs:
+if ar_obs:
     AR.get_result(max_training_frames, attr_dic_to_str(
-        attr_dic, inc_weight=True), gr_out_param, item_count_eptotal)
+        attr_dic, inc_weight=True), ar_out_param, item_count_eptotal)
 
 # endregion

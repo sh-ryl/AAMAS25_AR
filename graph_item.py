@@ -29,7 +29,7 @@ colors = ['blue', 'lightcoral', 'green', 'red', 'purple', 'brown',
 fig, axs = plt.subplots(1, len(wc)+1, figsize=(15, 5), sharey=True)
 
 # Load the datasets
-item_df = [pd.read_csv(f"mod/gr_log/{mod}/{combo}_avg_item_count.csv", header=None)
+item_df = [pd.read_csv(f"mod/ar_log/{mod}/{combo}_avg_item_count.csv", header=None)
            for combo in weight_combo]
 
 for idf in range(len(wc)):

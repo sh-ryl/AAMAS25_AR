@@ -88,34 +88,34 @@ class AttributeRecogniser(object):
                         f"AR model {i}: {self.tm_paths[i]}, Param: {self.tm_param[i]}")
 
         if "uvfa" in exp_param:
-            self.gr_num = len(self.uvfa_weight)
+            self.ar_num = len(self.uvfa_weight)
         else:
-            self.gr_num = len(self.trained_models)
+            self.ar_num = len(self.trained_models)
 
         # Init scores for evaluation
-        self.tm_dkl_sum = [0] * self.gr_num
+        self.tm_dkl_sum = [0] * self.ar_num
         self.tm_dkl_sum_eptotal = [[0 for y in range(
-            self.gr_num)]for x in range(max_steps)]  # 100 for max timestep
+            self.ar_num)]for x in range(max_steps)]  # 100 for max timestep
         self.tm_dkl_step_eptotal = deepcopy(self.tm_dkl_sum_eptotal)
 
-        self.tm_dkl_ravg_prev = [0] * self.gr_num
+        self.tm_dkl_ravg_prev = [0] * self.ar_num
         self.tm_dkl_ravg_eptotal = deepcopy(self.tm_dkl_sum_eptotal)
         self.tm_dkl_zbc_eptotal = deepcopy(self.tm_dkl_sum_eptotal)
 
         self.tm_bi_prob = [
-            1.0 / int(self.gr_num)] * int(self.gr_num)
+            1.0 / int(self.ar_num)] * int(self.ar_num)
         self.tm_bi_prob_eptotal = deepcopy(
             self.tm_dkl_sum_eptotal)
 
     def reset(self):
-        self.tm_dkl_sum = [0] * self.gr_num
+        self.tm_dkl_sum = [0] * self.ar_num
         self.tm_bi_prob = [
-            1.0 / int(self.gr_num)] * int(self.gr_num)
-        self.tm_dkl_ravg_prev = [0] * self.gr_num
+            1.0 / int(self.ar_num)] * int(self.ar_num)
+        self.tm_dkl_ravg_prev = [0] * self.ar_num
 
     def calculate_action_probs(self, model_no, state):
-        state_tensor = torch.from_numpy(state.getRepresentation(gr_obs=True,
-                                                                gr_param=self.tm_param[model_no])).float().to(
+        state_tensor = torch.from_numpy(state.getRepresentation(ar_obs=True,
+                                                                ar_param=self.tm_param[model_no])).float().to(
             self.device).unsqueeze(0)
         q = self.trained_models[model_no].forward(
             state_tensor).cpu().detach().squeeze()
@@ -127,7 +127,7 @@ class AttributeRecogniser(object):
         tm_act_probs = []
         tm_dkl_step = []
 
-        for i in range(self.gr_num):
+        for i in range(self.ar_num):
             model_no = i
             if "uvfa" in self.tm_param[0]:
                 model_no = 0
@@ -150,7 +150,7 @@ class AttributeRecogniser(object):
                         state.ab_rating['craft']) * 1
             bayes_pr_act += self.tm_bi_prob[i] * act_probs[action]
 
-        tm_bi_prob_new = [0] * self.gr_num
+        tm_bi_prob_new = [0] * self.ar_num
         eps = 1e-20
         if print_result:
             print()
@@ -166,7 +166,7 @@ class AttributeRecogniser(object):
                 f"{col[0]:3} {col[1]:60} {col[2]:10} {col[3]:10} {col[4]:10} {col[5]:10} {col[6]}")
             print()
 
-        for i in range(self.gr_num):
+        for i in range(self.ar_num):
             # kl div running avg
             dkl_ravg = momentum * \
                 self.tm_dkl_ravg_prev[i] + (1 - momentum) * tm_dkl_step[i]
@@ -297,7 +297,7 @@ class AttributeRecogniser(object):
         temp_min = max(self.tm_dkl_sum)
         temp_min_id = 0
 
-        for i in range(self.gr_num):
+        for i in range(self.ar_num):
             if self.tm_dkl_sum[i] < temp_min:
                 temp_min = self.tm_dkl_sum[i]
                 temp_min_id = i
@@ -344,18 +344,18 @@ class AttributeRecogniser(object):
 
         path = self.log_dir + "/" + attr_str + param_str + "_"
 
-        gr_result = [avg_dkl_sum, avg_dkl_step,
+        ar_result = [avg_dkl_sum, avg_dkl_step,
                      avg_dkl_ravg, avg_dkl_zbc, avg_bi_prob]
-        gr_result_str = ["avg_dkl_sum", "avg_dkl_step",
+        ar_result_str = ["avg_dkl_sum", "avg_dkl_step",
                          "avg_dkl_ravg", "avg_dkl_zbc", "avg_bi_prob"]
 
         if "uvfa" in self.tm_param[0]:
             legend = self.uvfa_weight
         else:
             legend = self.tm_paths
-        for i in range(len(gr_result)):
+        for i in range(len(ar_result)):
             self.generate_output(
-                gr_result[i], path, gr_result_str[i])
+                ar_result[i], path, ar_result_str[i])
 
         # item count
         self.generate_output(pd.DataFrame(avg_item_count),
