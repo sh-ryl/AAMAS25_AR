@@ -14,7 +14,7 @@ from cooperative_craft_world import _rewardable_items
 from neural_q_learner import NeuralQLearner
 from dqn import DQN_Config
 
-from goal_recogniser import GoalRecogniser
+from attribute_recogniser import AttributeRecogniser
 
 import torch
 
@@ -35,20 +35,20 @@ def float_to_str(f):
     return format(d1, 'f')
 
 
-def goal_dic_to_str(goal_dic, inc_weight):
+def attr_dic_to_str(attr_dic, inc_weight):
     # *S* why is this function outside of the class?
-    goal_dic_keys = list(goal_dic.keys())
-    goal_str = goal_dic_keys[0]
+    attr_dic_keys = list(attr_dic.keys())
+    attr_str = attr_dic_keys[0]
     if inc_weight:
-        goal_str += "_" + str(goal_dic[goal_dic_keys[0]])
-        for i in range(1, len(goal_dic_keys)):
-            goal_str += "_" + goal_dic_keys[i] + \
-                "_" + str(goal_dic[goal_dic_keys[i]])
+        attr_str += "_" + str(attr_dic[attr_dic_keys[0]])
+        for i in range(1, len(attr_dic_keys)):
+            attr_str += "_" + attr_dic_keys[i] + \
+                "_" + str(attr_dic[attr_dic_keys[i]])
     else:
-        for i in range(1, len(goal_dic_keys)):
-            goal_str += "_" + goal_dic_keys[i]
+        for i in range(1, len(attr_dic_keys)):
+            attr_str += "_" + attr_dic_keys[i]
 
-    return goal_str
+    return attr_str
 
 
 def reset_all():
@@ -69,7 +69,7 @@ def reset_all():
     total_reward = 0
 
     agent.reset(
-        goal_dic, current_scenario["externally_visible_goal_sets"][0], model_file)
+        attr_dic, current_scenario["externally_visible_attr_sets"][0], model_file)
     # will only reset with model file if it's on evaluation mode
 
     state = env.reset([agent], seed)
@@ -107,11 +107,11 @@ size = (7, 7)
 
 current_scenario = scenario.scenarios[sys.argv[1]]
 
-goal_sets = current_scenario["goal_sets"]
-goal_dic = goal_sets[0]
+attr_sets = current_scenario["attr_sets"]
+attr_dic = attr_sets[0]
 
-if "externally_visible_goal_sets" not in current_scenario:
-    current_scenario["externally_visible_goal_sets"] = goal_sets
+if "externally_visible_attr_sets" not in current_scenario:
+    current_scenario["externally_visible_attr_sets"] = attr_sets
 
 if "num_spawned" not in current_scenario:
     current_scenario["num_spawned"] = scenario.scenarios["default"]["num_spawned"]
@@ -253,10 +253,10 @@ ag_models_root = '/mod/ag/'
 ag_models_folder = ag_models_root + exp_param_path
 
 # saving/loading agent model for specific reward weightings
-result_folder = ag_models_folder + goal_dic_to_str(goal_dic, inc_weight=True)
+result_folder = ag_models_folder + attr_dic_to_str(attr_dic, inc_weight=True)
 if uvfa and not gr_obs:  # COMMENT OUT "and not gr_obs" TO USE UVFA MODEL FOR AGENT
     result_folder = ag_models_folder + \
-        goal_dic_to_str(goal_dic, inc_weight=False)
+        attr_dic_to_str(attr_dic, inc_weight=False)
 if belief:
     result_folder += "_hidden"
     for hi in current_scenario["hidden_items"][0]:
@@ -296,10 +296,10 @@ if gr_obs:
     model_dir = real_path + gr_models_folder
     print(f"GR model folder: {gr_models_folder}")
 
-    goal_log_path = real_path + '/mod/gr_log/' + \
-        goal_dic_to_str(goal_dic, inc_weight=False)  # doesn't include weight
-    if not os.path.exists(goal_log_path):
-        os.makedirs(goal_log_path)
+    attr_log_path = real_path + '/mod/gr_log/' + \
+        attr_dic_to_str(attr_dic, inc_weight=False)  # doesn't include weight
+    if not os.path.exists(attr_log_path):
+        os.makedirs(attr_log_path)
 # endregion
 
 # region DQN Settings
@@ -392,8 +392,8 @@ state = None
 if gr_obs:
     # creates a separate config for gr and agent
     gr_dqn_config = deepcopy(agent_params["dqn_config"])
-    GR = GoalRecogniser(goal_list=list(goal_dic.keys()), saved_model_dir=model_dir,
-                        dqn_config=gr_dqn_config, log_dir=goal_log_path, exp_param=exp_param, max_steps=max_steps)
+    GR = AttributeRecogniser(attr_list=list(attr_dic.keys()), saved_model_dir=model_dir,
+                             dqn_config=gr_dqn_config, log_dir=attr_log_path, exp_param=exp_param, max_steps=max_steps)
 # endregion
 
 reset_all()
@@ -452,8 +452,8 @@ while frame_num < max_training_frames:
         print()
 
         print("Agent")
-        print(f"root folder \t goal sets \t\t\t\t param")
-        print(f"{ag_models_root} \t {goal_dic} \t {exp_param}")
+        print(f"root folder \t attribute sets \t\t\t\t param")
+        print(f"{ag_models_root} \t {attr_dic} \t {exp_param}")
         print()
 
         print(f"Timestep: {frame_num} \t Total reward: {total_reward}")
@@ -526,7 +526,7 @@ while frame_num < max_training_frames:
                 steps_since_eval_began = 0
 
 if gr_obs:
-    GR.get_result(max_training_frames, goal_dic_to_str(
-        goal_dic, inc_weight=True), gr_out_param, item_count_eptotal)
+    GR.get_result(max_training_frames, attr_dic_to_str(
+        attr_dic, inc_weight=True), gr_out_param, item_count_eptotal)
 
 # endregion

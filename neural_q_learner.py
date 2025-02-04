@@ -365,9 +365,9 @@ class NeuralQLearner(agent.Agent):
         else:
             return a
 
-    def reset(self, goal_set, externally_visible_goal_sets, model_file):
+    def reset(self, attr_set, externally_visible_attr_sets, model_file):
 
-        super().reset(goal_set, externally_visible_goal_sets)
+        super().reset(attr_set, externally_visible_attr_sets)
 
         if self.test_mode:
             checkpoint = torch.load(model_file, map_location=self.device)

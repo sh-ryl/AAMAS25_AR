@@ -481,25 +481,25 @@ class CooperativeCraftWorld(gym.Env):
             if "uvfa" in self.exp_param:
                 if not self.test_mode:
                     reward_list = np.random.dirichlet(
-                        np.ones(len(agent.goal_set.keys())))
+                        np.ones(len(agent.attr_set.keys())))
                     # VERY HACKY FLAG :) so that state can know which one has uvfa
                 else:
-                    reward_list = agent.goal_set
+                    reward_list = agent.attr_set
                 reward_dic["uvfa"] = 0
 
             for item in _rewardable_items:
-                if item in agent.goal_set.keys():
+                if item in agent.attr_set.keys():
                     if "uvfa" in self.exp_param and not self.test_mode:
-                        item_id = list(agent.goal_set.keys()).index(item)
+                        item_id = list(agent.attr_set.keys()).index(item)
                         reward_dic[item] = reward_list[item_id]
                     else:
-                        reward_dic[item] = agent.goal_set[item]
+                        reward_dic[item] = agent.attr_set[item]
                 else:
                     reward_dic[item] = 0
                     if "incentive" in self.exp_param:
-                        # Incentivize collecting req items to craft goal set
+                        # Incentivize collecting req items to craft attribute set
                         for k, v in _recipes.items():
-                            if item in v[1] and k in agent.goal_set:
+                            if item in v[1] and k in agent.attr_set:
                                 reward_dic[item] = 0.2
                                 break
 
