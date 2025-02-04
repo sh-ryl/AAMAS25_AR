@@ -45,11 +45,11 @@ scenarios["default"]["hidden_items"] = [
 
 scenarios["train"] = {}
 
-scenarios["train"]["goal_sets"] = [
+scenarios["train"]["attr_sets"] = [
     {"gem": 0, "gold": 0}
 ]
 
 scenarios["eval"] = {}
-scenarios["eval"]["goal_sets"] = [
+scenarios["eval"]["attr_sets"] = [
     {"axe": 1, "bridge": 0.7}
 ]
