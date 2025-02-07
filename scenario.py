@@ -53,5 +53,5 @@ scenarios["train"]["attr_sets"] = [
 scenarios["eval"] = {}
 scenarios["eval"]["attr_sets"] = [
     # {"axe": 1, "bridge": 0.7}
-    {"cloth": 0.1, "stick": 0.9}
+    {"cloth": 0, "stick": 0}
 ]

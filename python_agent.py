@@ -256,7 +256,7 @@ ag_models_folder = ag_models_root + exp_param_path
 
 # saving/loading agent model for specific reward weightings
 result_folder = ag_models_folder + attr_dic_to_str(attr_dic, inc_weight=True)
-if uvfa and not ar_obs:  # COMMENT OUT "and not ar_obs" TO USE UVFA MODEL FOR AGENT
+if uvfa:  # and not ar_obs:  # COMMENT OUT "and not ar_obs" TO USE UVFA MODEL FOR AGENT
     result_folder = ag_models_folder + \
         attr_dic_to_str(attr_dic, inc_weight=False)
 if belief:

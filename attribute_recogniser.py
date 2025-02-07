@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import numpy as np
 from utils import elo
 from dqn import DQN, DQN_Config
+from scipy.stats import uniform
 
 import os
 import re
@@ -56,10 +57,18 @@ class AttributeRecogniser(object):
                 f"AR model {i}: {self.tm_paths[i]}, Param: {self.tm_param[i]}")
 
         if "uvfa" in exp_param:
+            # exp ver
             # currently only applied for attribute preferences and for 2 weights
-            self.uvfa_weight = [(x/10, (10-x)/10) for x in range(1, 10, 1)]
+            self.uvfa_weight = None
             self.attr_list = attr_list
-            print("UVFA observes these weights", self.uvfa_weight)
+            self.ar_num = 50  # len(self.uvfa_weight)
+            self.param = None
+
+            # old ver
+            # self.uvfa_weight = [(x/10, (10-x)/10) for x in range(1, 10, 1)]
+            # self.attr_list = attr_list
+            # print("UVFA observes these weights", self.uvfa_weight)
+            # self.ar_num = len(self.uvfa_weight)
         else:
             # Choose Models to include as observer
             print()
@@ -84,10 +93,6 @@ class AttributeRecogniser(object):
                 for i in range(len(self.tm_paths)):
                     print(
                         f"AR model {i}: {self.tm_paths[i]}, Param: {self.tm_param[i]}")
-
-        if "uvfa" in exp_param:
-            self.ar_num = len(self.uvfa_weight)
-        else:
             self.ar_num = len(self.trained_models)
 
         # Init scores for evaluation
@@ -125,90 +130,123 @@ class AttributeRecogniser(object):
         tm_act_probs = []
         tm_dkl_step = []
 
-        for i in range(self.ar_num):
-            model_no = i
-            if "uvfa" in self.tm_param[0]:
-                model_no = 0
+        if "uvfa" in self.tm_param[0]:
+            model_no = 0
+            # step 1 get rv
+            if self.uvfa_weight is None:
+                self.uvfa_weight = [(x, 1-x)
+                                    for x in np.random.uniform(size=self.ar_num)]
+                print(self.uvfa_weight)
+                input()
+            else:  # this assumes that gamma parameter is initialised from previous step
+                shape, scale = self.param
+                self.uvfa_weight = np.random.gamma(shape=shape, scale=scale)
+
+            # step 2 calculate posterior prob
+            tm_bi_prob_new = [0] * self.ar_num
+            for i in range(len(self.uvfa_weight)):
                 self.tm_param[0]["uvfa"] = {
                     self.attr_list[0]: self.uvfa_weight[i][0], self.attr_list[1]: self.uvfa_weight[i][1]}
-            act_probs = self.calculate_action_probs(model_no, state)
-            tm_act_probs.append(act_probs)
+                print(self.tm_param[0])
+                act_probs = self.calculate_action_probs(model_no, state)
+                tm_act_probs.append(act_probs)
 
-            # kl div sum
-            dkl_max = 100.0
-            dkl_step = min(act_probs[action].pow(-1).log().item(), dkl_max)
-            self.tm_dkl_sum[i] += dkl_step
-            tm_dkl_step.append(dkl_step)
+                print("weight", i, "act_probs", act_probs)
+                input()
+                bayes_pr_act += self.tm_bi_prob[i] * act_probs[action]
 
-            # bayes prob
-            if action == 5 and len(state.ab_rating) > 0:
-                # TODO - update later: modified transition function for ability level
-                act_probs[action] = act_probs[action] * \
-                    elo(state.ab_rating['player'],
-                        state.ab_rating['craft']) * 1
-            bayes_pr_act += self.tm_bi_prob[i] * act_probs[action]
+                tm_bi_prob_new[i] = tm_act_probs[i][action] * \
+                    self.tm_bi_prob[i] / bayes_pr_act+eps
 
-        tm_bi_prob_new = [0] * self.ar_num
-        eps = 1e-20
-        if print_result:
-            print()
-            print("---------------- AR Inference ---------------")
-            col = ['No.',
-                   'trained model paths',
-                   'DKL sum',
-                   'DKL ravg',
-                   'DKL zbc',
-                   'BI prob',
-                   'action prob']
-            print(
-                f"{col[0]:3} {col[1]:60} {col[2]:10} {col[3]:10} {col[4]:10} {col[5]:10} {col[6]}")
-            print()
+            # step 3 compute cdf
 
-        for i in range(self.ar_num):
-            # kl div running avg
-            dkl_ravg = momentum * \
-                self.tm_dkl_ravg_prev[i] + (1 - momentum) * tm_dkl_step[i]
-            self.tm_dkl_ravg_prev[i] = dkl_ravg
+            # step 4
+        else:
+            for i in range(self.ar_num):
+                model_no = i
+                if "uvfa" in self.tm_param[0]:
+                    model_no = 0
+                    self.tm_param[0]["uvfa"] = {
+                        self.attr_list[0]: self.uvfa_weight[i][0], self.attr_list[1]: self.uvfa_weight[i][1]}
+                act_probs = self.calculate_action_probs(model_no, state)
+                tm_act_probs.append(act_probs)
 
-            # kl div zero bias corrected
-            denom = 1 - pow(momentum, ((frame_num % self.max_steps) + 1))
-            dkl_zbc = dkl_ravg/denom
+                # kl div sum
+                dkl_max = 100.0
+                dkl_step = min(act_probs[action].pow(-1).log().item(), dkl_max)
+                self.tm_dkl_sum[i] += dkl_step
+                tm_dkl_step.append(dkl_step)
 
-            # bayesian inf
-            tm_bi_prob_new[i] = tm_act_probs[i][action] * \
-                self.tm_bi_prob[i] / bayes_pr_act+eps
+                # bayes prob
+                if action == 5 and len(state.ab_rating) > 0:
+                    # TODO - update later: modified transition function for ability level
+                    act_probs[action] = act_probs[action] * \
+                        elo(state.ab_rating['player'],
+                            state.ab_rating['craft']) * 1
+                bayes_pr_act += self.tm_bi_prob[i] * act_probs[action]
 
+            tm_bi_prob_new = [0] * self.ar_num
+            eps = 1e-20
             if print_result:
-                tm_act_probs[i] = [round(float(x), 3) for x in tm_act_probs[i]]
-                a = str(i)+'.'
-                b = str(
-                    self.uvfa_weight[i]) if "uvfa" in self.tm_param[0] else self.tm_paths[i]
-                c = round(self.tm_dkl_sum[i], 3)
-                d = round(dkl_ravg, 3)
-                e = round(dkl_zbc, 3)
-                f = round(float(tm_bi_prob_new[i]), 3)
-                g = tm_act_probs[i]
+                print()
+                print("---------------- AR Inference ---------------")
+                col = ['No.',
+                       'trained model paths',
+                       'DKL sum',
+                       'DKL ravg',
+                       'DKL zbc',
+                       'BI prob',
+                       'action prob']
                 print(
-                    f"{a:3} {b:60} {c:<10} {d:<10} {e:<10} {f:<10} {g}")
+                    f"{col[0]:3} {col[1]:60} {col[2]:10} {col[3]:10} {col[4]:10} {col[5]:10} {col[6]}")
+                print()
 
-            # update scores
-            # dkl sum
-            self.tm_dkl_sum_eptotal[frame_num %
-                                    self.max_steps][i] += self.tm_dkl_sum[i]
-            self.tm_dkl_step_eptotal[frame_num %
-                                     self.max_steps][i] += tm_dkl_step[i]
+            for i in range(self.ar_num):
+                # kl div running avg
+                dkl_ravg = momentum * \
+                    self.tm_dkl_ravg_prev[i] + (1 - momentum) * tm_dkl_step[i]
+                self.tm_dkl_ravg_prev[i] = dkl_ravg
 
-            # dkl ravg
-            self.tm_dkl_ravg_eptotal[frame_num %
-                                     self.max_steps][i] += dkl_ravg
+                # kl div zero bias corrected
+                denom = 1 - pow(momentum, ((frame_num % self.max_steps) + 1))
+                dkl_zbc = dkl_ravg/denom
 
-            # dkl zbc
-            self.tm_dkl_zbc_eptotal[frame_num %
-                                    self.max_steps][i] += dkl_zbc
-            # bi prob
-            self.tm_bi_prob_eptotal[frame_num %
-                                    self.max_steps][i] += tm_bi_prob_new[i]
-        self.tm_bi_prob = tm_bi_prob_new
+                # bayesian inf
+                tm_bi_prob_new[i] = tm_act_probs[i][action] * \
+                    self.tm_bi_prob[i] / bayes_pr_act+eps
+
+                if print_result:
+                    tm_act_probs[i] = [round(float(x), 3)
+                                       for x in tm_act_probs[i]]
+                    a = str(i)+'.'
+                    b = str(
+                        self.uvfa_weight[i]) if "uvfa" in self.tm_param[0] else self.tm_paths[i]
+                    c = round(self.tm_dkl_sum[i], 3)
+                    d = round(dkl_ravg, 3)
+                    e = round(dkl_zbc, 3)
+                    f = round(float(tm_bi_prob_new[i]), 3)
+                    g = tm_act_probs[i]
+                    print(
+                        f"{a:3} {b:60} {c:<10} {d:<10} {e:<10} {f:<10} {g}")
+
+                # update scores
+                # dkl sum
+                self.tm_dkl_sum_eptotal[frame_num %
+                                        self.max_steps][i] += self.tm_dkl_sum[i]
+                self.tm_dkl_step_eptotal[frame_num %
+                                         self.max_steps][i] += tm_dkl_step[i]
+
+                # dkl ravg
+                self.tm_dkl_ravg_eptotal[frame_num %
+                                         self.max_steps][i] += dkl_ravg
+
+                # dkl zbc
+                self.tm_dkl_zbc_eptotal[frame_num %
+                                        self.max_steps][i] += dkl_zbc
+                # bi prob
+                self.tm_bi_prob_eptotal[frame_num %
+                                        self.max_steps][i] += tm_bi_prob_new[i]
+            self.tm_bi_prob = tm_bi_prob_new
 
     def find_folders(self, directory, required_objects, exp_param):
         c_tm_path = []

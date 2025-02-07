@@ -262,7 +262,7 @@ class CraftWorldState():
 
         # ADD reward
         # COMMENT OUT "and not self.test_mode" TO USE UVFA MODEL FOR AGENT
-        if self.uvfa and not ar_obs and not self.test_mode:
+        if self.uvfa and not ar_obs:  # and not self.test_mode:
             for item in sorted_keys:
                 if _reward != []:
                     rep.append(_reward[self.player_turn][item])
@@ -274,6 +274,9 @@ class CraftWorldState():
                     rep.append(ar_param["uvfa"][item])
                 else:
                     rep.append(0)
+
+        print(rep)
+        input()
         return np.array(rep, dtype=np.float32)
 
     def render(self, use_delay=False, log_dir=None):
