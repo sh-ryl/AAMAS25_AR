@@ -13,7 +13,12 @@ Feel free to email Sheryl at sheryl.mantik@student.rmit.edu.au if you have any i
 
 To recreate the results from the paper, run:
 
-```python ...```
+### Preferences
+```python python_agent.py eval AR```
+### Beliefs
+```python python_agent.py eval AR belief```
+### Ability Level
+```python python_agent.py eval AR ability incentive```
 
 Agent scores are automatically logged to results/cooperative_craft_world_dqn/results_*scenario_name*.csv.
 
