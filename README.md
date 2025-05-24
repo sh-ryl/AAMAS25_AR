@@ -7,8 +7,6 @@ Code is adapted from *Multi-Agent Intention Recognition and Progression*, by Mic
 
 ## Installing the Requirements
 
-....
-
 Feel free to email Sheryl at sheryl.mantik@student.rmit.edu.au if you have any issues getting the code to run.
 
 ## Running
