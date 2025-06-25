@@ -6,32 +6,32 @@ import matplotlib.pyplot as plt
 
 # File paths of CSVs
 # cloth_stick
-# root = "mod/ar_log/cloth_stick"
-# ag_wc = range(1, 10, 2)
-# ag_weight_combo = [
-#     f'/cloth_{round(x/10,1)}_stick_{round(1-x/10,1)}' for x in ag_wc]
-# ag_titles = [
-#     f"cloth: {round(x/10,1)}, stick: {round(1-x/10,1)}" for x in ag_wc]
-# ar_wc = range(1, 10, 2)
-# ar_weight_combo = [
-#     f"cloth: {round(x/10,1)}, stick: {round(1-x/10,1)}" for x in ar_wc]
-# dkl_y = [0.9, 2.5]
-# bi_y = [-0.05, 1.05]
-# legend_loc = (0.84, 0.37)
-
-# UVFA cloth_stick
 root = "mod/ar_log/cloth_stick"
 ag_wc = range(1, 10, 2)
 ag_weight_combo = [
-    f'/cloth_{round(x/10,1)}_stick_{round(1-x/10,1)}_uvfa' for x in ag_wc]
+    f'/cloth_{round(x/10,1)}_stick_{round(1-x/10,1)}' for x in ag_wc]
 ag_titles = [
     f"cloth: {round(x/10,1)}, stick: {round(1-x/10,1)}" for x in ag_wc]
-ar_wc = range(1, 10, 1)
+ar_wc = range(1, 10, 2)
 ar_weight_combo = [
     f"cloth: {round(x/10,1)}, stick: {round(1-x/10,1)}" for x in ar_wc]
 dkl_y = [0.9, 2.5]
 bi_y = [-0.05, 1.05]
 legend_loc = (0.84, 0.37)
+
+# UVFA cloth_stick
+# root = "mod/ar_log/cloth_stick"
+# ag_wc = range(1, 10, 2)
+# ag_weight_combo = [
+#     f'/cloth_{round(x/10,1)}_stick_{round(1-x/10,1)}_uvfa' for x in ag_wc]
+# ag_titles = [
+#     f"cloth: {round(x/10,1)}, stick: {round(1-x/10,1)}" for x in ag_wc]
+# ar_wc = range(1, 10, 1)
+# ar_weight_combo = [
+#     f"cloth: {round(x/10,1)}, stick: {round(1-x/10,1)}" for x in ar_wc]
+# dkl_y = [0.9, 2.5]
+# bi_y = [-0.05, 1.05]
+# legend_loc = (0.84, 0.37)
 
 # axe_bridge
 # root = "mod/ar_log/axe_bridge"

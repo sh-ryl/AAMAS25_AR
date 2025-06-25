@@ -8,15 +8,15 @@ from constants import REWARDABLE_ITEMS
 # wc = [(1, -1, ""), (-1, 1, ""), (1, -1, "_belief"), (-1, 1, "_belief")]
 # weight_combo = [f'/iron_0.7_wood_{w[0]}_grass_{w[1]}{w[2]}' for w in wc]
 
-# mod = "cloth_stick"
-# wc = range(1, 10, 2)
-# weight_combo = [
-#     f'/cloth_{round(w/10,1)}_stick_{round(1-w/10,1)}' for w in wc]
-
 mod = "cloth_stick"
 wc = range(1, 10, 2)
 weight_combo = [
-    f'/cloth_{round(w/10,1)}_stick_{round(1-w/10,1)}_uvfa' for w in wc]
+    f'/cloth_{round(w/10,1)}_stick_{round(1-w/10,1)}' for w in wc]
+
+# mod = "cloth_stick"
+# wc = range(1, 10, 2)
+# weight_combo = [
+#     f'/cloth_{round(w/10,1)}_stick_{round(1-w/10,1)}_uvfa' for w in wc]
 
 # mod = "axe_bridge"
 # wc = [100, 500]

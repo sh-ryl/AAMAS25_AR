@@ -63,7 +63,9 @@ def reset_all():
         seed = random.randrange(sys.maxsize)
 
     if agent_params["test_mode"]:
-        print("\nSetting environment seed = " + str(seed) + "...")
+        print(
+            f'Current episode: {(frame_num/max_training_frames) * 100}', end=' - ')
+        print(f'Setting environment seed = {str(seed)}')
 
     total_reward = 0
 
@@ -182,12 +184,6 @@ if "render" in exp_param:
         check_out.write("Printing result from AR\n")
 else:
     check_out.write("Rendering environment OFF\n")
-
-# if "result" in exp_param:
-#     exp_param.remove('result')
-#     if ar_obs:
-#         print_result = True
-#         check_out.write("Printing result from AR\n")
 
 if "limit" in exp_param:
     limit = True

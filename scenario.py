@@ -28,11 +28,11 @@ scenarios["default"]["hidden_items"] = [
 
 # region WEIGHT
 # Goal preferences
-# {"gem": 0.1, "gold": 0.9}
-# {"gem": 0.3, "gold": 0.7}
-# {"gem": 0.5, "gold": 0.5}
-# {"gem": 0.7, "gold": 0.3}
-# {"gem": 0.9, "gold": 0.1}
+# {"cloth": 0.1, "stick": 0.9}
+# {"cloth": 0.3, "stick": 0.7}
+# {"cloth": 0.5, "stick": 0.5}
+# {"cloth": 0.7, "stick": 0.3}
+# {"cloth": 0.9, "stick": 0.1}
 
 # Belief
 # {"iron": 0.7, "wood": -1, "grass": 1}
@@ -46,12 +46,10 @@ scenarios["default"]["hidden_items"] = [
 scenarios["train"] = {}
 
 scenarios["train"]["attr_sets"] = [
-    # {"gem": 0, "gold": 0}
-    {"cloth": 0.35, "stick": 0.63}
+    {"cloth": 0.9, "stick": 0.1}
 ]
 
 scenarios["eval"] = {}
 scenarios["eval"]["attr_sets"] = [
-    # {"axe": 1, "bridge": 0.7}
-    {"cloth": 0.1, "stick": 0.9}
+    {"cloth": 0.9, "stick": 0.1}
 ]
