@@ -5,9 +5,12 @@ by Sheryl Mantik, Michael Dann, Minyi Li, Huong Ha, and Julie Porteous.
 
 Code is adapted from *Multi-Agent Intention Recognition and Progression*, by Michael Dann, Yuan Yao, Natasha Alechina, Brian Logan, Felipe Meneguzzi and John Thangarajah.
 
+Feel free to email Sheryl at sheryl.mantik@student.rmit.edu.au if you have any issues getting the code to run.
+
 ## Installing the Requirements
 
-Feel free to email Sheryl at sheryl.mantik@student.rmit.edu.au if you have any issues getting the code to run.
+Code is tested on Python 3.9.4.
+Required packages can be found under 'requirements.txt'.
 
 ## Model Training
 
