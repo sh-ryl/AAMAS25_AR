@@ -7,20 +7,26 @@ Code is adapted from *Multi-Agent Intention Recognition and Progression*, by Mic
 
 ## Installing the Requirements
 
-....
-
 Feel free to email Sheryl at sheryl.mantik@student.rmit.edu.au if you have any issues getting the code to run.
 
-## Running
-
-To recreate the results from the paper, run:
-
-```python ...```
-
-Agent scores are automatically logged to results/cooperative_craft_world_dqn/results_*scenario_name*.csv.
+## Model Training
 
 To train a new RL policy, run:
 
 ```python python_agent.py train```
 
 The goal items for the RL policy can be configured in scenario.py (line 32).
+
+Agent scores are automatically logged to mod/*flags_during_training*/training_scores.csv.
+Flags during training are the ones specified when running the python script.
+
+## Execution
+
+To recreate the results from the paper, run:
+
+### Preferences
+```python python_agent.py eval AR```
+### Beliefs
+```python python_agent.py eval AR belief```
+### Ability Level
+```python python_agent.py eval AR ability incentive```
