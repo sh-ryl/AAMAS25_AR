@@ -3,6 +3,9 @@ result
 results
 venv
 scenario.py
-mod
+mod/mod_ignore
+mod/ar_log
+mod/gr_log
+mod/ag_log
 .DS_Store
 check_out
